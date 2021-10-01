@@ -20,10 +20,13 @@ namespace UserMaintenance
             InitializeComponent();
             lblFullName.Text = Resource1.FullName; // label2
             btnAdd.Text = Resource1.Add; // button1
+            button2.Text = Resource1.Delete;
+            button1.Text = Resource1.FileWrite;
 
             listUsers.DataSource = users;
             listUsers.ValueMember = "ID";
             listUsers.DisplayMember = "FullName";
+
         }
 
         private void btnAdd_Click(object sender, EventArgs e)
@@ -52,6 +55,22 @@ namespace UserMaintenance
                         sw.WriteLine(";");
                     }
                     sw.WriteLine();
+                }
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            if (listUsers.SelectedIndex!=null)
+            {
+                User u = (User)listUsers.SelectedItem;
+                foreach (var user in users)
+                {
+                    if (u.ID == user.ID)
+                    {
+                        users.Remove(user);
+                        return;
+                    }
                 }
             }
         }
