@@ -97,9 +97,27 @@ namespace RealEstate
                 values[counter, 8] = "=("+GetCell(counter + 2, 8).ToString()+")*1000000"+"/"+GetCell(counter + 2, 7).ToString();
                 counter++;
             }
+
             xlSheet.get_Range(
             GetCell(2, 1),
             GetCell(1 + values.GetLength(0), values.GetLength(1))).Value2 = values;
+            int lastRowID = xlSheet.UsedRange.Rows.Count;
+            Excel.Range headerRange = xlSheet.get_Range(GetCell(1, 1), GetCell(1, headers.Length));
+            Excel.Range table = xlSheet.get_Range(GetCell(1, 1), GetCell(lastRowID, headers.Length));
+            Excel.Range firstColumn = xlSheet.get_Range(GetCell(2, 1), GetCell(lastRowID-1, 1));
+            Excel.Range lastColumn = xlSheet.get_Range(GetCell(2,headers.Length), GetCell(lastRowID-1, headers.Length));
+            headerRange.Font.Bold = true;
+            headerRange.VerticalAlignment = Excel.XlVAlign.xlVAlignCenter;
+            headerRange.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+            headerRange.EntireColumn.AutoFit();
+            headerRange.RowHeight = 40;
+            headerRange.Interior.Color = Color.LightBlue;
+            headerRange.BorderAround2(Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThick);
+            table.BorderAround2(Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThick);
+            firstColumn.Font.Bold = true;
+            firstColumn.Interior.Color = Color.LightYellow;
+            lastColumn.Interior.Color = Color.LightGreen;
+            //lastColumn.NumberFormat("{0:0.##}");
         }
         private string GetCell(int x, int y)
         {
