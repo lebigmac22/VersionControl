@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Forms.DataVisualization.Charting;
+using System.Xml;
 using Week06.Entities;
 using Week06.MnbServiceReference;
 
@@ -20,11 +22,14 @@ namespace Week06
         public Form1()
         {
             InitializeComponent();
-            Atvaltas();
+            string r = Atvaltas();
+            GetxmlData(r);
             dataGridView1.DataSource = Rates;
+            SetChart();
+
         }
 
-        private void Atvaltas()
+        private string Atvaltas()
         {
             MNBArfolyamServiceSoapClient mnbService = new MNBArfolyamServiceSoapClient();
             GetExchangeRatesRequestBody request = new GetExchangeRatesRequestBody();
@@ -34,6 +39,42 @@ namespace Week06
 
             var response = mnbService.GetExchangeRates(request);
             string result = response.GetExchangeRatesResult;
+            return result;
+        }
+
+        private void GetxmlData(string result)
+        {
+            XmlDocument xml = new XmlDocument();
+            xml.LoadXml(result);
+            foreach (XmlElement item in xml.DocumentElement)
+            {
+                RateData ratedata = new RateData();
+                ratedata.Date = Convert.ToDateTime(item.GetAttribute("date"));
+                object child = item.ChildNodes[0];
+                int unit = int.Parse(((XmlElement)child).GetAttribute("unit"));
+                decimal value = decimal.Parse(((XmlElement)child).InnerText);
+                ratedata.Value = unit != 0 ? value / unit : 0;
+                ratedata.Currency = ((XmlElement)child).GetAttribute("curr");
+                Rates.Add(ratedata);
+            }
+        }
+        private void SetChart()
+        {
+
+            chartRateData.DataSource = Rates;
+            var series = chartRateData.Series[0];
+            series.ChartType = SeriesChartType.Line;
+            series.XValueMember = "Date";
+            series.YValueMembers = "Value";
+            series.BorderWidth = 2;
+
+            var legend = chartRateData.Legends[0];
+            legend.Enabled = false;
+
+            var chartArea = chartRateData.ChartAreas[0];
+            chartArea.AxisX.MajorGrid.Enabled = false;
+            chartArea.AxisY.MajorGrid.Enabled = false;
+            chartArea.AxisY.IsStartedFromZero = false;
         }
     }
 }
