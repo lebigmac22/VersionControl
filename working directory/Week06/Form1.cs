@@ -17,11 +17,16 @@ namespace Week06
     public partial class Form1 : Form
     {
         BindingList<RateData> Rates = new BindingList<RateData>();
+        BindingList<string> Currencies = new BindingList<string>();
         
         
         public Form1()
         {
             InitializeComponent();
+            GetCurrencies();
+            string curr = GetCurrencies();
+            setCurrencies(curr);
+            comboBox1.DataSource = Currencies;
             RefreshData();
 
         }
@@ -96,6 +101,27 @@ namespace Week06
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             RefreshData();
+        }
+        private string GetCurrencies()
+        {
+            MNBArfolyamServiceSoapClient mnbService = new MNBArfolyamServiceSoapClient();
+            GetCurrenciesRequestBody request = new GetCurrenciesRequestBody();
+            return mnbService.GetCurrencies(request).GetCurrenciesResult;
+        }
+
+        private void setCurrencies(string curr)
+        {
+            XmlDocument xml = new XmlDocument();
+            xml.LoadXml(curr);
+            foreach (XmlElement item in xml.DocumentElement)
+            {
+                XmlElement childElement = (XmlElement)item.ChildNodes[0];
+
+                if (childElement != null)
+                {
+                    Currencies.Add(childElement.InnerText);
+                }
+            }
         }
     }
 }
