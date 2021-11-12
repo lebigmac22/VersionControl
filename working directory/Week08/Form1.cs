@@ -7,16 +7,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Week08.Abstractions;
 using Week08.Entites;
 
 namespace Week08
 {
     public partial class Form1 : Form
     {
-        List<Ball> _balls = new List<Ball>();
-        private BallFactory _factory;
+        List<Toy> _toys = new List<Toy>();
+        private IToyFactory _factory;
 
-        public BallFactory Factory
+        public IToyFactory Factory
         {
             get { return _factory; }
             set { _factory = value; }
@@ -30,8 +31,8 @@ namespace Week08
 
         private void createTimer_Tick(object sender, EventArgs e)
         {
-            Ball b = Factory.CreateNew();
-            _balls.Add(b);
+            Toy b = Factory.CreateNew();
+            _toys.Add(b);
             mainPanel.Controls.Add(b);
             b.Left = -60;
         }
@@ -39,18 +40,30 @@ namespace Week08
         private void conveyorTimer_Tick(object sender, EventArgs e)
         {
            int rightest = 0;
-            foreach (var item in _balls)
+            foreach (var item in _toys)
             {
-                item.MoveBall();
+                item.MoveToy();
                 rightest = (item.Left > rightest) ? item.Left : rightest;
             }
 
             if (rightest>1000)
             {
-                Ball removeball = _balls[0];
-                _balls.Remove(removeball);
-                mainPanel.Controls.Remove(removeball);
+                Toy removetoy = _toys[0];
+                _toys.Remove(removetoy);
+                mainPanel.Controls.Remove(removetoy);
             }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            Factory = new BallFactory();
+            label1.Text = "Coming next: Ball";
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            Factory = new CarFactory();
+            label1.Text = "Coming next: Car";
         }
     }
 }
